@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask-select</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+</head>
+<body>
+    Пример работы выбора категории и под категории.
+     
+    <form method="post" name="form" action="/">
+        {{ form.csrf_token }}
+        {{ form.category.label }}
+        {{ form.category }}
+        {{ form.sub_category.label }} 
+        {{ form.sub_category }}
+        <input type="submit" value="Отправить">
+    </form>
+
+    <script type="text/javascript">
+        function choice_category(){
+            var tmp_id = parseInt ($("#category").val());
+            if(tmp_id == 0)
+            {
+                $("#sub_category").attr('disabled', 'disabled');
+            }
+            else
+            {
+                $("#sub_category").removeAttr('disabled');
+                load_subcategory();
+            }
+        }
+
+        function load_subcategory(){
+            $.ajax({
+                type: "POST",
+                url: "/get_sub_category",
+                data: $('form').serialize(),
+                success: function(response) {
+                    var json = jQuery.parseJSON(response)
+                    obj = Object.keys(json)
+
+                    $("#sub_category")
+                        .find('option')
+                        .remove()
+                        .end()
+                        .append('<option value="0">Не выбрано</option>')
+                        .val('0');
+
+                    var value, key;
+                    for(item in obj){
+                        value = json[obj[item]];
+                        key = obj[item];
+                    $("#sub_category").append($("<option></option>")
+                            .attr("value",key)
+                            .text(value)); 
+                    }
+                
+                },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+        }
+
+        $(document).ready(function() {
+            choice_category();
+            $("#category").change(function() {
+                choice_category();
+            });
+
+            $("#sub_category").change(function() {
+            });
+        });
+
+    </script>
+</body>
+</html>

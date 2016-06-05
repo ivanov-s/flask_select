@@ -1,0 +1,7 @@
+*.swp
+.ropeproject
+python2
+python3
+*.pyc
+*.sqlite
+env
